@@ -3,8 +3,8 @@
 Userspace daemon that switches the keyboard into **driver mode**, converts
 analog travel into normal keypresses, and lets you tune actuation thresholds.
 
-Based on ideas from [meeuw/razer-analog](https://github.com/meeuw/razer-analog)
-(Huntsman Mini Analog). Target device: **Razer Huntsman V2 Analog** (`1532:0266`).
+Based on ideas from [meeuw/razer-analog](https://github.com/meeuw/razer-analog).
+Target device: **Razer Huntsman V2 Analog** (`1532:0266`).
 
 ## Features (v0.1)
 
@@ -13,38 +13,110 @@ Based on ideas from [meeuw/razer-analog](https://github.com/meeuw/razer-analog)
 - Configurable press / release thresholds
 - Calibration (`dump` / `calibrate`) to discover Razer key IDs
 - Coexist with OpenRazer for RGB (this daemon owns input in driver mode)
+- Forward lock LEDs (incl. Scroll Lock) for layout indicators (e.g. KDE)
 
-## Quick start
+## Requirements
+
+- Linux with `uinput` and hidraw support
+- Python **3.10+**
+- Access to the keyboard’s `/dev/hidraw*` nodes and `/dev/uinput` (typically **root**, or membership in `plugdev` / `input` after installing the udev rules below)
+- Optional but recommended: [OpenRazer](https://openrazer.github.io/) for RGB (input is handled by this daemon)
+
+## Installation
+
+### 1. Clone and install into a virtualenv
 
 ```bash
-cd /path/to/razer-analog-linux
+git clone https://github.com/cidious/razer-analog-linux.git
+cd razer-analog-linux
+
 python3 -m venv .venv
+.venv/bin/pip install -U pip
 .venv/bin/pip install -e .
 
-# Discover USB sysfs parent (T: usb_device for the keyboard)
-udevadm info -t | less   # search Razer_Huntsman_V2_Analog
-
-# Dump raw key IDs (no typing injection). Quit with ESC (not Ctrl+C on this KB).
-sudo .venv/bin/razer-analog-linux dump
-
-# Interactive calibration for missing keys (ESC aborts)
-sudo .venv/bin/razer-analog-linux calibrate
-
-# Run virtual keyboard
-sudo .venv/bin/razer-analog-linux run \
-  --device /sys/devices/.../usb3/3-1 \
-  --config config/default.toml
+# optional: run tests
+.venv/bin/pip install -e '.[dev]'
+.venv/bin/pytest -q
 ```
 
-Or use the helper: `sudo ./scripts/run.sh run --device …`
+The CLI entry point is `.venv/bin/razer-analog-linux`.
 
-**Do not use `sudo poetry run`** unless a project `.venv` exists — root Poetry
-will miss packages (`ModuleNotFoundError: evdev`).
+**Do not use `sudo poetry run …`** unless this project `.venv` exists and Poetry
+is using it — otherwise root’s environment misses packages (`ModuleNotFoundError: evdev`).
+Prefer:
+
+```bash
+sudo .venv/bin/razer-analog-linux …
+# or
+sudo ./scripts/run.sh …
+```
+
+### 2. (Optional) udev rules for non-root hidraw / uinput
+
+```bash
+sudo cp dist/udev/99-razer-analog-linux.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+# ensure your user is in the groups used by the rules
+sudo usermod -aG plugdev,input "$USER"
+# log out and back in (or reboot) for groups to apply
+```
+
+Until udev/groups are set up, run the daemon with `sudo`.
+
+### 3. (Optional) systemd template
+
+A sample unit is in `dist/systemd/razer-analog-linux@.service`. It expects an
+installed binary at `/usr/local/bin/razer-analog-linux` and config under
+`/etc/razer-analog-linux/`. Adjust paths before enabling; for day-to-day use,
+running from the venv (step 1) is enough.
+
+### 4. Find the device (optional)
+
+Auto-detect usually works for `1532:0266`:
+
+```bash
+.venv/bin/razer-analog-linux find-device
+# → /sys/devices/…/usbX/Y-Z
+```
+
+Or locate the USB parent manually:
+
+```bash
+udevadm info -t | less   # search Razer_Huntsman_V2_Analog, note T: usb_device / P:
+```
+
+Pass it explicitly with `--device /sys/devices/…/usbX/Y-Z` if needed.
+
+## Usage
+
+```bash
+# Dump raw key_id / depth (no key injection). Quit with ESC — not Ctrl+C on this KB.
+sudo .venv/bin/razer-analog-linux dump
+
+# Map missing keys into the layout JSON (SPACE=skip, ESC=abort)
+sudo .venv/bin/razer-analog-linux calibrate
+
+# Run virtual keyboard (Ctrl+C works again here — keys are injected via uinput)
+sudo .venv/bin/razer-analog-linux run --actuate 128 --release 96
+
+# Same with config file
+sudo .venv/bin/razer-analog-linux run --config config/default.toml
+```
+
+Helper wrapper (uses the project `.venv`):
+
+```bash
+sudo ./scripts/run.sh run --actuate 128 --release 96
+```
 
 ## Safety
 
-Driver mode disables normal HID key reports. Always stop the daemon cleanly
-(Ctrl-C). Recovery if stuck:
+Driver mode **disables normal HID key reports**. Always stop the daemon cleanly
+(Ctrl-C on `run`, or ESC on `dump` / `calibrate`).
+
+If the keyboard is stuck with no input:
 
 ```bash
 printf '\x00\x00' | sudo tee \
@@ -54,15 +126,16 @@ printf '\x00\x00' | sudo tee \
 
 ## OpenRazer
 
-OpenRazer may keep managing RGB. This tool sets driver mode via hidraw (and
-mirrors to OpenRazer `device_mode` sysfs when present). Stop `openrazer-daemon`
+OpenRazer may keep managing RGB. This tool sets driver mode via hidraw and
+mirrors OpenRazer `device_mode` sysfs when present. Stop `openrazer-daemon`
 only if mode fighting appears.
 
 ## Config
 
-See `config/default.toml` for thresholds and `config/layouts/huntsman_v2_analog.json`
-for the key map (fill unknowns with `calibrate`).
+- Thresholds / device options: `config/default.toml`
+- Key map: `config/layouts/huntsman_v2_analog.json`  
+  (re-run `calibrate` to adjust; dedicated media keys/dial are not analog — skip with SPACE)
 
 ## License
 
-GPL-3.0-or-later (aligned with upstream razer-analog / OpenRazer ecosystem).
+GPL-3.0-or-later.
