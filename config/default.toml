@@ -1,0 +1,23 @@
+[threshold]
+# Depth 0 = up, 255 = fully bottomed.
+actuate = 128
+release = 96
+repeat_delay_ms = 200
+repeat_rate_ms = 30
+
+[device]
+# Optional override; CLI --device wins. Leave empty to auto-detect 1532:0266.
+sysfs_path = ""
+product_ids = [0x0266]
+
+[openrazer]
+# Prefer also writing OpenRazer device_mode sysfs when found (coexistence).
+sync_sysfs = true
+# If true, refuse to start when openrazer-daemon is running (debug only).
+require_daemon_stopped = false
+
+[layout]
+# Path relative to repo root or absolute. calibrate writes here.
+file = "config/layouts/huntsman_v2_analog.json"
+# V2: Super is Super (not software-Fn like Mini Analog).
+meta_as_fn = false

@@ -1,0 +1,13 @@
+[Unit]
+Description=Razer Analog Linux (%i)
+After=systemd-udevd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/razer-analog-linux run --device /%I --config /etc/razer-analog-linux/default.toml
+ExecStop=/bin/true
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

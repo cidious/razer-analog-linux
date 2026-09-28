@@ -1,0 +1,3 @@
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0266", ENV{DEVTYPE}=="usb_device", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0266", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+KERNEL=="uinput", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput"

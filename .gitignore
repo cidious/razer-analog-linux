@@ -1,0 +1,35 @@
+# Virtualenvs / editor
+.venv/
+venv/
+.env
+.idea/
+.vscode/
+*~
+.DS_Store
+
+# Python caches / coverage
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.eggs/
+build/
+
+# Built wheels/sdists only — keep dist/udev and dist/systemd tracked
+/dist/*.whl
+/dist/*.tar.gz
+/dist/*.egg
+
+# Upstream meeuw/razer-analog clone (reference only; not this project)
+/razer-analog/
+
+# Local tarballs / dumps
+*.tar
+*.tar.gz
+*.log
+/tmp/

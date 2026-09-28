@@ -1,0 +1,32 @@
+[project]
+name = "razer-analog-linux"
+version = "0.1.0"
+description = "Driver-mode analog keyboard support for Razer Huntsman V2 Analog on Linux"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "razer-analog-linux contributors" }]
+dependencies = [
+    "ioctl-opt>=1.3",
+    "evdev>=1.6.1",
+    "pyudev>=0.24",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.2", "pytest-cov>=4.0"]
+
+[project.scripts]
+razer-analog-linux = "razer_analog_linux.cli:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+razer_analog_linux = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
