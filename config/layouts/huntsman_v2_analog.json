@@ -125,6 +125,7 @@
     "VOLUMEUP": "skipped during calibrate (no analog report \u2014 typical for dedicated media keys / dial)",
     "PREVIOUSSONG": "skipped during calibrate (no analog report \u2014 typical for dedicated media keys / dial)",
     "PLAYPAUSE": "skipped during calibrate (no analog report \u2014 typical for dedicated media keys / dial)",
-    "NEXTSONG": "skipped during calibrate (no analog report \u2014 typical for dedicated media keys / dial)"
+    "NEXTSONG": "skipped during calibrate (no analog report \u2014 typical for dedicated media keys / dial)",
+    "PAUSE": "skipped during calibrate (no analog report \u2014 typical for dedicated media keys / dial)"
   }
 }

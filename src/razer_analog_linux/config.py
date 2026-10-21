@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Set
 
+from razer_analog_linux.hotkeys import HotkeyBinding, parse_hotkeys
 from razer_analog_linux.protocol import PRODUCT_HUNTSMAN_V2_ANALOG
 from razer_analog_linux.threshold import ThresholdConfig
 
@@ -26,6 +27,7 @@ class AppConfig:
     require_daemon_stopped: bool = False
     layout_file: str = "config/layouts/huntsman_v2_analog.json"
     meta_as_fn: bool = False
+    hotkeys: List[HotkeyBinding] = field(default_factory=list)
 
 
 def _repo_root() -> Path:
@@ -70,4 +72,9 @@ def load_config(path: Optional[str | Path] = None) -> AppConfig:
     lay = data.get("layout") or {}
     cfg.layout_file = str(lay.get("file", cfg.layout_file))
     cfg.meta_as_fn = bool(lay.get("meta_as_fn", False))
+
+    # [[hotkeys]] array of tables
+    raw_hotkeys = data.get("hotkeys") or []
+    if isinstance(raw_hotkeys, list):
+        cfg.hotkeys = parse_hotkeys(raw_hotkeys)
     return cfg

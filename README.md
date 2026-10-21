@@ -135,6 +135,9 @@ only if mode fighting appears.
 - Thresholds / device options: `config/default.toml`
 - Key map: `config/layouts/huntsman_v2_analog.json`  
   (re-run `calibrate` to adjust; dedicated media keys/dial are not analog — skip with SPACE)
+- Optional `[[hotkeys]]` in the TOML: run a command on a key (e.g. Pause /
+  Shift+Pause) inside the daemon. Prefer this when KDE/custom shortcuts do not
+  see keys from the virtual keyboard; see the examples in `config/default.toml`.
 
 ## License
 

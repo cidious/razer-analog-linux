@@ -164,6 +164,7 @@ async def run_daemon(cfg: AppConfig, device_sysfs: str) -> None:
                 meta_as_fn=cfg.meta_as_fn,
                 repeat_delay_ms=cfg.repeat_delay_ms,
                 repeat_rate_ms=cfg.repeat_rate_ms,
+                hotkeys=cfg.hotkeys,
             ),
             name="virtual_keyboard",
         ),

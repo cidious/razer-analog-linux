@@ -21,3 +21,17 @@ require_daemon_stopped = false
 file = "config/layouts/huntsman_v2_analog.json"
 # V2: Super is Super (not software-Fn like Mini Analog).
 meta_as_fn = false
+
+# Optional: run commands on key press (bypasses KDE/global shortcuts).
+# Useful when compositor shortcuts miss keys from the virtual uinput keyboard.
+# Keys are consumed by default (not typed). $HOME expands; under sudo the
+# command runs as SUDO_USER with DISPLAY/XAUTHORITY so xdotool/xsel work.
+#
+# [[hotkeys]]
+# key = "PAUSE"
+# command = "$HOME/bin/layout_changing_previous.sh"
+#
+# [[hotkeys]]
+# key = "PAUSE"
+# shift = true
+# command = "$HOME/bin/layout_changing_selected.sh"
